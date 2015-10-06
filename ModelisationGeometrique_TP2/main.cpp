@@ -183,7 +183,6 @@ void drawCone(const point3 &centre, const double rayon, const int nb_meridiens, 
 		y2 = centre.y + rayon * sin(teta2);
 		z2 = centre.z;
 
-		//if () 
 		x3 = centre.x + rayon_haut * cos(teta);
 		y3 = centre.y + rayon_haut * sin(teta);
 		z3 = centre.z + h;
