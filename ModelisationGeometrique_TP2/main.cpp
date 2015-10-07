@@ -35,6 +35,12 @@ float tz=0.0;
 
 int etape = 0;
 
+void printCommandes()
+{
+	printf("=== Commandes ===\n\n");
+	printf(" Espace : changer de forme\n");
+}
+
 /* initialisation d'OpenGL*/
 static void init()
 {
@@ -351,6 +357,7 @@ switch (key)
 
 	default:
 		printf ("La touche %d non active.\n", key);
+		printCommandes();
 	break;
 	}
 glutPostRedisplay();
@@ -363,21 +370,23 @@ void windowMenu(int value)
 
 int main(int argc, char **argv)
 {
-   glutInitWindowSize(400, 400);
-   glutInit(&argc, argv);
-   glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
-   glutCreateWindow("TP2");
-   init();
-   glutReshapeFunc(reshape);
-   glutKeyboardFunc(&window_key_down);
-   glutDisplayFunc(display);
-   glutPassiveMotionFunc(gestionSouris);
-   glutSpecialFunc(&gestionFleche);
+	printCommandes();
+	glutInitWindowSize(400, 400);
+	glutInitWindowPosition(500, 400);
+	glutInit(&argc, argv);
+	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
+	glutCreateWindow("TP2");
+	init();
+	glutReshapeFunc(reshape);
+	glutKeyboardFunc(&window_key_down);
+	glutDisplayFunc(display);
+	glutPassiveMotionFunc(gestionSouris);
+	glutSpecialFunc(&gestionFleche);
 
-   glutCreateMenu(windowMenu);
-   glutAddMenuEntry("Changer de forme", KEY_SPACE);
-   glutAttachMenu(GLUT_RIGHT_BUTTON);
+	glutCreateMenu(windowMenu);
+	glutAddMenuEntry("Changer de forme", KEY_SPACE);
+	glutAttachMenu(GLUT_RIGHT_BUTTON);
 
-   glutMainLoop();
-   return 0;
+	glutMainLoop();
+	return 0;
 }
