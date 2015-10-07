@@ -111,19 +111,18 @@ void drawCylindre(const point3 &centre, const double rayon, const double hauteur
 	
 }
 
-void drawSphere(const point3 &centre, const double rayon, const int nb_paralleles, const int nb_meridiens, bool multicolor)
+void drawSphere(const point3 &centre, const point3& color, const double rayon, const int nb_paralleles, const int nb_meridiens, const bool quads)
 {
 	double phi_i, teta_j, phi_i2, teta_j2, x, y, z, x2, y2, z2, x3, y3, z3, x4, y4, z4;
 	double step_i = 2. * M_PI / (double)nb_paralleles;
 	double step_j = 2. * M_PI / (double)nb_meridiens;
 
-	// GL_QUADS GL_LINE_LOOP
-	if (multicolor)
-		glBegin(GL_LINE_LOOP);
-	else
+	if (quads)
 		glBegin(GL_QUADS);
-
-	glColor3f(0., 0., 1.);
+	else
+		glBegin(GL_LINE_LOOP);
+		
+	glColor3f(color.x, color.y, color.z);
 	for (int i = 0; i < nb_paralleles; i++)
 	{
 		for (int j = 0; j < nb_meridiens; j++)
@@ -237,13 +236,13 @@ void display(void)
 		drawCylindre(point3(0., 0., 0.), 10., 2., 100);
 		break;
 	case 3:
-		drawSphere(point3(0., 0., 0.), 10., 100, 100, false);
+		drawSphere(point3(0., 0., 0.), point3(1., 1., 1.), 10., 100, 100, true);
 		break;
 	case 4:
-		drawSphere(point3(0., 0., 0.), 8., 10, 10, true);
+		drawSphere(point3(0., 0., 0.), point3(0., 1., 0.5), 8., 10, 10, false);
 		break;
 	case 5:
-		drawSphere(point3(0., 0., 0.), 4., 50, 50, true);
+		drawSphere(point3(0., 0., 0.), point3(0., 1., 1.), 4., 50, 50, false);
 		break;
 	case 6:
 		drawCone(point3(0., 0., 0.), 5., 50., 15.);
