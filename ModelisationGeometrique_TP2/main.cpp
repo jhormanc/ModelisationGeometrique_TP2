@@ -48,6 +48,7 @@ static void init()
 	// Si vous avez des choses à initialiser, c est ici.	
 	glClearDepth(1.0f);                   // Set background depth to farthest
 	glEnable(GL_DEPTH_TEST);   // Enable depth testing for z-culling
+	glEnable(GL_CULL_FACE);
 	glDepthFunc(GL_LEQUAL);    // Set the type of depth-test
 	glShadeModel(GL_SMOOTH);   // Enable smooth shading
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);  // Nice perspective corrections
@@ -117,49 +118,90 @@ void drawCylindre(const point3 &centre, const double rayon, const double hauteur
 	
 }
 
-void drawSphere(const point3 &centre, const point3& color, const double rayon, const int nb_paralleles, const int nb_meridiens, const bool quads)
+void drawSphere(const point3 &centre, const point3& color, const double rayon, const int nb_paralleles, const int nb_meridiens, const int nb_meridiens_suppr, const bool quads)
 {
 	double phi_i, teta_j, phi_i2, teta_j2, x, y, z, x2, y2, z2, x3, y3, z3, x4, y4, z4;
-	double step_i = 2. * M_PI / (double)nb_paralleles;
+	double step_i = 1. * M_PI / (double)nb_paralleles;
 	double step_j = 2. * M_PI / (double)nb_meridiens;
 
-	if (quads)
-		glBegin(GL_QUADS);
-	else
+	if (!quads)
 		glBegin(GL_LINE_LOOP);
+	else
+		glBegin(GL_TRIANGLES);
 		
-	glColor3f(color.x, color.y, color.z);
 	for (int i = 0; i < nb_paralleles; i++)
 	{
+		phi_i = step_i * (double)i;
+		phi_i2 = step_i * (double)(i + 1.);
+
 		for (int j = 0; j < nb_meridiens; j++)
 		{
-			phi_i = step_i * (double)i;
-			teta_j = step_j * (double)j;
-			phi_i2 = step_i * (double)(i + 1.);
-			teta_j2 = step_j * (double)(j + 1.);
+			if (j >= nb_meridiens_suppr)
+			{
+				teta_j = step_j * (double)j;
+				teta_j2 = step_j * (double)(j + 1.);
 
-			x = centre.x + rayon * sin(phi_i) * cos(teta_j);
-			y = centre.y + rayon * sin(phi_i) * sin(teta_j);
-			z = centre.z + rayon * cos(phi_i);
+				x = centre.x + rayon * sin(phi_i) * cos(teta_j);
+				y = centre.y + rayon * sin(phi_i) * sin(teta_j);
+				z = centre.z + rayon * cos(phi_i);
 
-			x2 = centre.x + rayon * sin(phi_i2) * cos(teta_j);
-			y2 = centre.y + rayon * sin(phi_i2) * sin(teta_j);
-			z2 = centre.z + rayon * cos(phi_i2);
+				x2 = centre.x + rayon * sin(phi_i2) * cos(teta_j);
+				y2 = centre.y + rayon * sin(phi_i2) * sin(teta_j);
+				z2 = centre.z + rayon * cos(phi_i2);
 
-			x3 = centre.x + rayon * sin(phi_i2) * cos(teta_j2);
-			y3 = centre.y + rayon * sin(phi_i2) * sin(teta_j2);
-			z3 = centre.z + rayon * cos(phi_i2);
+				x3 = centre.x + rayon * sin(phi_i2) * cos(teta_j2);
+				y3 = centre.y + rayon * sin(phi_i2) * sin(teta_j2);
+				z3 = centre.z + rayon * cos(phi_i2);
 
-			x4 = centre.x + rayon * sin(phi_i) * cos(teta_j2);
-			y4 = centre.y + rayon * sin(phi_i) * sin(teta_j2);
-			z4 = centre.z + rayon * cos(phi_i);
+				x4 = centre.x + rayon * sin(phi_i) * cos(teta_j2);
+				y4 = centre.y + rayon * sin(phi_i) * sin(teta_j2);
+				z4 = centre.z + rayon * cos(phi_i);
 
-			glVertex3f(x, y, z);
-			glVertex3f(x2, y2, z2);
-			glVertex3f(x3, y3, z3);
-			glVertex3f(x4, y4, z4);
+				glColor3f(color.x, color.y, color.z);
+				glVertex3f(x, y, z);
+				glVertex3f(x2, y2, z2);
+				glVertex3f(x3, y3, z3);
+
+				if (i > 0 && i < nb_paralleles - 1)
+				{
+					glColor3f(1., 0., 0.5);
+					glVertex3f(x, y, z);
+					glVertex3f(x3, y3, z3);
+					glVertex3f(x4, y4, z4);
+				}
+			}
+			else if (j == 0)
+			{
+				teta_j = step_j * (double)j;
+				teta_j2 = step_j * (double)(j + nb_meridiens_suppr);
+
+				x = centre.x + rayon * sin(phi_i) * cos(teta_j);
+				y = centre.y + rayon * sin(phi_i) * sin(teta_j);
+				z = centre.z + rayon * cos(phi_i);
+
+				x2 = centre.x + rayon * sin(phi_i2) * cos(teta_j);
+				y2 = centre.y + rayon * sin(phi_i2) * sin(teta_j);
+				z2 = centre.z + rayon * cos(phi_i2);
+
+				x3 = centre.x + rayon * sin(phi_i2) * cos(teta_j);
+				y3 = centre.y + rayon * sin(phi_i2) * sin(teta_j);
+				z3 = centre.z + rayon * cos(phi_i2);
+
+				x4 = centre.x + rayon * sin(phi_i2) * cos(teta_j2);
+				y4 = centre.y + rayon * sin(phi_i2) * sin(teta_j2);
+				z4 = centre.z + rayon * cos(phi_i2);
+
+				glVertex3f(x, y, z);
+				glVertex3f(centre.x, centre.x, z);
+				glVertex3f(x2, y2, z2);
+
+				glVertex3f(x3, y3, z3);
+				glVertex3f(centre.x, centre.x, z2);
+				glVertex3f(x4, y4, z4);
+			}
 		}
 	}
+
 	glEnd();
 }
 
@@ -242,13 +284,13 @@ void display(void)
 		drawCylindre(point3(0., 0., 0.), 10., 2., 100);
 		break;
 	case 3:
-		drawSphere(point3(0., 0., 0.), point3(1., 1., 1.), 10., 100, 100, true);
+		drawSphere(point3(0., 0., 0.), point3(1., 1., 1.), 10., 100, 100, 30, false);
 		break;
 	case 4:
-		drawSphere(point3(0., 0., 0.), point3(0., 1., 0.5), 8., 10, 10, false);
+		drawSphere(point3(0., 0., 0.), point3(0., 1., 0.5), 8., 10, 10, 1, true);
 		break;
 	case 5:
-		drawSphere(point3(0., 0., 0.), point3(0., 1., 1.), 4., 50, 50, false);
+		drawSphere(point3(0., 0., 0.), point3(0., 1., 1.), 4., 50, 50, 0, false);
 		break;
 	case 6:
 		drawCone(point3(0., 0., 0.), 5., 50., 15.);
