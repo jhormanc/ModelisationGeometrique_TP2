@@ -132,14 +132,14 @@ void drawSphere(const point3 &centre, const point3& color, const double rayon, c
 	for (int i = 0; i < nb_paralleles; i++)
 	{
 		phi_i = step_i * (double)i;
-		phi_i2 = step_i * (double)(i + 1.);
+		phi_i2 = step_i * (double)((double)i + 1.);
 
 		for (int j = 0; j < nb_meridiens; j++)
 		{
-			if (j >= nb_meridiens_suppr)
+			if (j >= nb_meridiens_suppr || j == 0)
 			{
 				teta_j = step_j * (double)j;
-				teta_j2 = step_j * (double)(j + 1.);
+				teta_j2 = step_j * (double)(j + (j >= nb_meridiens_suppr ? 1. : (double)nb_meridiens_suppr));
 
 				x = centre.x + rayon * sin(phi_i) * cos(teta_j);
 				y = centre.y + rayon * sin(phi_i) * sin(teta_j);
@@ -149,55 +149,62 @@ void drawSphere(const point3 &centre, const point3& color, const double rayon, c
 				y2 = centre.y + rayon * sin(phi_i2) * sin(teta_j);
 				z2 = centre.z + rayon * cos(phi_i2);
 
-				x3 = centre.x + rayon * sin(phi_i2) * cos(teta_j2);
-				y3 = centre.y + rayon * sin(phi_i2) * sin(teta_j2);
-				z3 = centre.z + rayon * cos(phi_i2);
-
-				x4 = centre.x + rayon * sin(phi_i) * cos(teta_j2);
-				y4 = centre.y + rayon * sin(phi_i) * sin(teta_j2);
-				z4 = centre.z + rayon * cos(phi_i);
-
-				glColor3f(color.x, color.y, color.z);
-				glVertex3f(x, y, z);
-				glVertex3f(x2, y2, z2);
-				glVertex3f(x3, y3, z3);
-
-				if (i > 0 && i < nb_paralleles - 1)
-				{
-					glColor3f(1., 0., 0.5);
-					glVertex3f(x, y, z);
-					glVertex3f(x3, y3, z3);
-					glVertex3f(x4, y4, z4);
-				}
-			}
-			else if (j == 0)
-			{
-				teta_j = step_j * (double)j;
-				teta_j2 = step_j * (double)(j + nb_meridiens_suppr);
-
-				x = centre.x + rayon * sin(phi_i) * cos(teta_j);
-				y = centre.y + rayon * sin(phi_i) * sin(teta_j);
-				z = centre.z + rayon * cos(phi_i);
-
-				x2 = centre.x + rayon * sin(phi_i2) * cos(teta_j);
-				y2 = centre.y + rayon * sin(phi_i2) * sin(teta_j);
-				z2 = centre.z + rayon * cos(phi_i2);
-
-				x3 = centre.x + rayon * sin(phi_i2) * cos(teta_j);
-				y3 = centre.y + rayon * sin(phi_i2) * sin(teta_j);
-				z3 = centre.z + rayon * cos(phi_i2);
+				x3 = centre.x + rayon * sin(phi_i) * cos(teta_j2);
+				y3 = centre.y + rayon * sin(phi_i) * sin(teta_j2);
+				z3 = centre.z + rayon * cos(phi_i);
 
 				x4 = centre.x + rayon * sin(phi_i2) * cos(teta_j2);
 				y4 = centre.y + rayon * sin(phi_i2) * sin(teta_j2);
 				z4 = centre.z + rayon * cos(phi_i2);
 
-				glVertex3f(x, y, z);
-				glVertex3f(centre.x, centre.x, z);
-				glVertex3f(x2, y2, z2);
+				if (j >= nb_meridiens_suppr)
+				{
+					glColor3f(color.x, color.y, color.z);
+					if (i > 0)
+					{
+						if (i == nb_paralleles - 1)
+							glColor3f(1., (double)(j % 2), 0.);
+						glVertex3f(x, y, z);
+						glVertex3f(x2, y2, z2);
+						glVertex3f(x3, y3, z3);
+					}
+					else
+					{
+						glColor3f(0., (double)(j % 2), 0.);
+						glVertex3f(x4, y4, z4);
+						glVertex3f(x3, y3, z3);
+						glVertex3f(x2, y2, z2);
+						
+					}
+					 
+					if (i > 0 && i < nb_paralleles - 1)
+					{
+						glColor3f(1., 0., 0.5);
+						glVertex3f(x2, y2, z2);
+						glVertex3f(x4, y4, z4);
+						glVertex3f(x3, y3, z3);
+					}
+				}
+				else
+				{
+					glColor3f(0., 0., 1);
+					glVertex3f(x, y, z);
+					glVertex3f(x2, y2, z2);
+					glVertex3f(centre.x, centre.y, z);
+					glColor3f(0., 1., 1);
+					glVertex3f(x2, y2, z2);
+					glVertex3f(centre.x, centre.y, z2);
+					glVertex3f(centre.x, centre.y, z);
 
-				glVertex3f(x3, y3, z3);
-				glVertex3f(centre.x, centre.x, z2);
-				glVertex3f(x4, y4, z4);
+					glColor3f(0., 1., 1);
+					glVertex3f(centre.x, centre.y, z3);
+					glVertex3f(centre.x, centre.y, z4);
+					glVertex3f(x4, y4, z4);
+					glColor3f(0., 0., 1);
+					glVertex3f(x3, y3, z3);
+					glVertex3f(centre.x, centre.y, z3);
+					glVertex3f(x4, y4, z4);
+				}
 			}
 		}
 	}
@@ -284,13 +291,13 @@ void display(void)
 		drawCylindre(point3(0., 0., 0.), 10., 2., 100);
 		break;
 	case 3:
-		drawSphere(point3(0., 0., 0.), point3(1., 1., 1.), 10., 100, 100, 30, false);
+		drawSphere(point3(0., 0., 0.), point3(1., 1., 1.), 10., 30, 30, 8, true);
 		break;
 	case 4:
-		drawSphere(point3(0., 0., 0.), point3(0., 1., 0.5), 8., 10, 10, 1, true);
+		drawSphere(point3(0., 0., 0.), point3(0., 1., 0.5), 8., 10, 10, 2, true);
 		break;
 	case 5:
-		drawSphere(point3(0., 0., 0.), point3(0., 1., 1.), 4., 50, 50, 0, false);
+		drawSphere(point3(0., 0., 0.), point3(0., 1., 1.), 15., 20, 20, 0, false);
 		break;
 	case 6:
 		drawCone(point3(0., 0., 0.), 5., 50., 15.);
